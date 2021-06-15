@@ -25,7 +25,7 @@ import org.apache.beam.sdk.values.TypeDescriptors;
 import java.util.List;
 import java.util.Map;
 
-public class EventPreprocessor {
+public class EventAggregator {
 
     private static final String DEBUG_PATH = "src/main/resources/tmp";
 
