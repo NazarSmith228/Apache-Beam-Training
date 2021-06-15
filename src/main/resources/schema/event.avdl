@@ -1,0 +1,46 @@
+@namespace ("dataflow.model")
+protocol EventProtocol {
+
+  record Subject
+  {
+    @java-class("java.lang.String") string type;
+    int id;
+  }
+
+  record Event
+  {
+    @java-class("java.lang.String") string id;
+    @java-class("java.lang.String") string userId;
+    @java-class("java.lang.String") string city;
+    @java-class("java.lang.String") string eventType;
+    long timestamp;
+    Subject eventSubject;
+  }
+
+  record EventInfo
+  {
+    @java-class("java.lang.String") string id;
+    @java-class("java.lang.String") string userId;
+    long timestamp;
+    @java-class("java.lang.String") string eventType;
+  }
+
+  record Activity {
+    @java-class("java.lang.String") string eventType;
+    long pastWeekCount;
+    long pastWeekUniqueCount;
+    long pastMonthCount;
+    long pastMonthUniqueCount;
+  }
+
+  record EventStatistics {
+    Subject eventSubject;
+    @java-class("java.util.ArrayList") array<Activity> activities;
+  }
+
+  record Summary {
+    @java-class("java.lang.String") string city;
+    @java-class("java.util.ArrayList") array<EventStatistics> activities;
+  }
+
+}
