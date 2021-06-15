@@ -24,3 +24,4 @@ out/
 *.iws
 /src/main/resources/output/
 /src/main/resources/tmp/
+/src/main/resources/sample/output

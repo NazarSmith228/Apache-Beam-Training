@@ -11,3 +11,4 @@
 #### If you want to add some custom options - modify JobOptions interface. 
 #### If you want to run the pipeline on some other environment (Cloud Dataflow, Spark, Flink etc.) - check Beam SDK for the desired runners and update the runner profile in pom.xml.
 #### In order to have a proper view of .avro files - install Avro/Parquet Viewer plugin for IntelliJ.
+#### P.S there is also a sample processing job (sample/ directory), which aggregates event data and writes output to .txt files, nevermind on it :)

@@ -8,6 +8,7 @@ import dataflow.transform.dofn.GroupBySubjectFn;
 import dataflow.transform.dofn.StatisticsAggregatorFn;
 import dataflow.transform.dofn.StatisticsTransformerFn;
 import org.apache.beam.sdk.Pipeline;
+import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.*;
 import org.apache.beam.sdk.io.AvroIO;
 import org.apache.beam.sdk.io.FileIO;
@@ -27,8 +28,6 @@ import java.util.Map;
 
 public class EventAggregator {
 
-    private static final String DEBUG_PATH = "src/main/resources/tmp";
-
     public static void main(String[] args) {
         PipelineOptionsFactory.register(JobOptions.class);
 
@@ -38,6 +37,18 @@ public class EventAggregator {
                 .withValidation()
                 .as(JobOptions.class);
 
+        PipelineResult.State state = runProcessingPipeline(jobOptions);
+
+        if (state == PipelineResult.State.DONE) {
+            System.out.println("Job succeeded.");
+        } else {
+            System.err.println("Job did not manage to succeed.");
+        }
+    }
+
+    private static final String DEBUG_PATH = "src/main/resources/tmp";
+
+    private static PipelineResult.State runProcessingPipeline(JobOptions jobOptions) {
         Pipeline pipeline = Pipeline.create(jobOptions);
 
         PCollection<String> lines = pipeline
@@ -179,6 +190,7 @@ public class EventAggregator {
                                 .to(jobOptions.getOutput())
                 );
 
-        pipeline.run().waitUntilFinish();
+        return pipeline.run().waitUntilFinish();
     }
+
 }
