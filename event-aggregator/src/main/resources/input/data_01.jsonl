@@ -1,0 +1,11 @@
+{"id":6,"userId":"Nazar","city":"Kyiv","eventType":"drug","timestamp": 1624447418000,"eventSubject":{"type":"webpage","id":1}}
+{"id":2,"userId":"Ivan","city":"Kyiv","eventType":"click","timestamp": 1623252802000,"eventSubject":{"type":"article","id":2}}
+{"id":14,"userId":"Kolya","city":"Kyiv","eventType":"click","timestamp": 1623516310000,"eventSubject":{"type":"article","id":1}}
+{"id":17,"userId":"Maks","city":"Kyiv","eventType":"scroll","timestamp": 1620837910000,"eventSubject":{"type":"webpage","id":1}}
+{"id":22,"userId":"Vasyl","city":"Kyiv","eventType":"click","timestamp": 1623066310000,"eventSubject":{"type":"webpage","id":2}}
+{"id":13,"userId":"Nazar","city":"Kyiv","eventType":"drug","timestamp": 1622760363000,"eventSubject":{"type":"article","id":2}}
+{"id":56,"userId":"Ivan","city":"Kyiv","eventType":"scroll","timestamp": 1621809963000,"eventSubject":{"type":"webpage","id":3}}
+{"id":32,"userId":"Ivan","city":"Kyiv","eventType":"scroll","timestamp": 1615761963000,"eventSubject":{"type":"article","id":1}}
+{"id":44,"userId":"Nazar","city":"Kyiv","eventType":"click","timestamp": 1622846763000,"eventSubject":{"type":"article","id":3}}
+{"id":42,"userId":"Kolya","city":"Kyiv","eventType":"drug","timestamp": 1615808763000,"eventSubject":{"type":"webpage","id":3}}
+{"id":4,"userId":"Nazar","city":"Odessa","eventType":"click","timestamp": 1623591862000,"eventSubject":{"type":"article","id":2}}

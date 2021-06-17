@@ -1,0 +1,11 @@
+{"id":53,"userId":"Kolya","city":"Odessa","eventType":"scroll","timestamp": 1617108363000,"eventSubject":{"type":"article","id":2}}
+{"id":1,"userId":"Nazar","city":"Lviv","eventType":"click","timestamp": 1623311476947,"eventSubject":{"type":"article","id":1}}
+{"id":7,"userId":"Maks","city":"Lviv","eventType":"scroll","timestamp": 1623311476631,"eventSubject":{"type":"article","id":3}}
+{"id":8,"userId":"Maks","city":"Lviv","eventType":"click","timestamp": 1621697078000,"eventSubject":{"type":"webpage","id":2}}
+{"id":5,"userId":"Ivan","city":"Lviv","eventType":"drug","timestamp": 1617803062000,"eventSubject":{"type":"webpage","id":2}}
+{"id":39,"userId":"Kolya","city":"Lviv","eventType":"drug","timestamp": 1623501963000,"eventSubject":{"type":"webpage","id":2}}
+{"id":40,"userId":"Nazar","city":"Lviv","eventType":"click","timestamp": 1623415563000,"eventSubject":{"type":"article","id":2}}
+{"id":26,"userId":"Vasyl","city":"Lviv","eventType":"click","timestamp": 1618145163000,"eventSubject":{"type":"article","id":2}}
+{"id":67,"userId":"Vasyl","city":"Lviv","eventType":"scroll","timestamp": 1623624363000,"eventSubject":{"type":"webpage","id":3}}
+{"id":98,"userId":"Maks","city":"Lviv","eventType":"drug","timestamp": 1623710763000,"eventSubject":{"type":"article","id":1}}
+{"id":89,"userId":"Ivan","city":"Lviv","eventType":"scroll","timestamp": 1621050363000,"eventSubject":{"type":"webpage","id":2}}

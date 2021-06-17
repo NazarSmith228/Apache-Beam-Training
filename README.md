@@ -1,8 +1,10 @@
 # Apache-Beam-Training
 
-## Data processing job that produces statistics related to some events.
+## EventAggregator Job
 
-### To run this job locally you need to add the next command line arguments:
+### EventAggregator is a data processing job that produces statistics related to some events.
+
+#### To run this job locally you need to add the next command line arguments:
 1) --input (where to read initial data from)
 2) --output (where to write resulting data)
 3) --runner (DirectRunner.class for local running)
