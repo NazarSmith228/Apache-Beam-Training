@@ -53,13 +53,8 @@ public class SampleEventAggregator {
 
         PCollection<KV<String, Event>> cityEventKVs = events
                 .apply("Create city - event pairs",
-                        GroupByKey.compose(
-                                (SerializableFunction<PCollection<Event>, PCollection<KV<String, Event>>>) input ->
-                                        input.apply("Use city of the event as a key",
-                                                WithKeys.of(
-                                                        (SerializableFunction<Event, String>) Event::getCity
-                                                )
-                                        )
+                        WithKeys.of(
+                                (SerializableFunction<Event, String>) Event::getCity
                         )
                 )
                 .setCoder(

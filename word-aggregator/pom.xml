@@ -2,16 +2,42 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <parent>
-        <groupId>com.epam.koval</groupId>
         <artifactId>apache-beam-training</artifactId>
+        <groupId>com.epam.koval</groupId>
         <version>7.7.7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>event-aggregator</artifactId>
+    <artifactId>word-aggregator</artifactId>
     <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.beam</groupId>
+            <artifactId>beam-sdks-java-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro-compiler</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro-maven-plugin</artifactId>
+        </dependency>
+    </dependencies>
 
     <profiles>
         <profile>
@@ -28,42 +54,6 @@
         </profile>
     </profiles>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-sdks-java-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.beam</groupId>
-            <artifactId>beam-sdks-java-extensions-json-jackson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.avro</groupId>
-            <artifactId>avro-compiler</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.avro</groupId>
-            <artifactId>avro-maven-plugin</artifactId>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -79,8 +69,9 @@
                             <goal>idl-protocol</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>src/main/resources/schema</sourceDirectory>
+                            <sourceDirectory>src/main/resources/</sourceDirectory>
                             <outputDirectory>src/main/java/</outputDirectory>
+                            <stringType>String</stringType>
                         </configuration>
                     </execution>
                 </executions>
@@ -92,5 +83,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
