@@ -1,4 +1,4 @@
-@namespace ("aggregator.model")
+@namespace ("job.model")
 protocol EventProtocol {
 
   record Subject
