@@ -1,0 +1,10 @@
+USER,account1,Ivan,26
+ACCOUNT,account1,Active,true,200
+USER,account2,Nazar,20
+ACCOUNT,account2,Inactive,false,300
+USER,account3,Maks,35
+ACCOUNT, account3, Active,true,3000
+ACCOUNT,account4,Inactive,true,100
+USER,account4,Fedor,16
+COMPANY,UA,EPAM Systems,account1
+COMPANY,USA,EPAM Systems,account4

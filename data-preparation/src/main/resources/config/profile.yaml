@@ -1,0 +1,105 @@
+layouts:
+  USER:
+    accountId: string
+    name: string
+    age: long
+  ACCOUNT:
+    accountId: string
+    description: string
+    enabled: boolean
+    balance: long
+  COMPANY:
+    country: string
+    brand: string
+    accountId: string
+  EMPLOYEE:
+    name: string
+    age: long
+    accountId: string
+    description: string
+    enabled: boolean
+    balance: long
+    country: string
+    brand: string
+  USER_ACCOUNT:
+    name: string
+    age: long
+    accountId: string
+    description: string
+    balance: long
+    enabled: boolean
+
+actions:
+  - type: validate
+    recordType: "USER"
+    field: accountId
+    constraint: job.action.model.validation.NonNullConstraint
+  - type: validate
+    recordType: "USER"
+    field: age
+    constraint: job.action.model.validation.PositiveConstraint
+  - type: validate
+    recordType: "USER"
+    field: name
+    constraint: job.action.model.validation.NonNullConstraint
+
+  - type: validate
+    recordType: "ACCOUNT"
+    field: accountId
+    constraint: job.action.model.validation.NonNullConstraint
+  - type: validate
+    recordType: "ACCOUNT"
+    field: balance
+    constraint: job.action.model.validation.PositiveConstraint
+  - type: validate
+    recordType: "ACCOUNT"
+    field: enabled
+    constraint: job.action.model.validation.NonNullConstraint
+
+  - type: validate
+    recordType: "COMPANY"
+    field: accountId
+    constraint: job.action.model.validation.NonNullConstraint
+  - type: validate
+    recordType: "COMPANY"
+    field: brand
+    constraint: job.action.model.validation.NonNullConstraint
+
+  - type: groupBy
+    recordTypes:
+      - USER
+      - ACCOUNT
+    groupingKey: accountId
+    resultRecordName: USER_ACCOUNT
+
+  - type: groupBy
+    recordTypes:
+      - USER
+      - ACCOUNT
+      - COMPANY
+    groupingKey: accountId
+    resultRecordName: EMPLOYEE
+
+  - type: mapToAvro
+    sourceLayout: USER_ACCOUNT
+    targetSchema: CreditFile.avro
+    mapping:
+      name: user.name
+      age: user.age
+      accountId: account.accountId
+      description: account.description
+      balance: account.balance
+      enabled: account.enabled
+
+  - type: mapToAvro
+    sourceLayout: EMPLOYEE
+    targetSchema: CorporateData.avro
+    mapping:
+      name: user.name
+      age: user.age
+      accountId: account.accountId
+      description: account.description
+      balance: account.balance
+      enabled: account.enabled
+      country: company.country
+      brand: company.brand

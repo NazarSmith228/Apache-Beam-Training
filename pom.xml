@@ -23,6 +23,7 @@
         <version.projectlombok>1.18.20</version.projectlombok>
         <java.version>1.8</java.version>
         <snakeyaml.version>1.21</snakeyaml.version>
+        <apache.commons.version>3.12.0</apache.commons.version>
     </properties>
 
     <dependencyManagement>
@@ -81,6 +82,12 @@
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${apache.commons.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
