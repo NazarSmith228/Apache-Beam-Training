@@ -4,18 +4,17 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.beam.sdk.schemas.Schema;
 import org.apache.beam.sdk.schemas.utils.AvroUtils;
 import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.Row;
 
-public class ConvertToGenericRecordsDoFn extends DoFn<KV<String,Row>, KV<String,GenericRecord>> {
+public class ConvertToGenericRecordsDoFn extends DoFn<Row, GenericRecord> {
 
     @ProcessElement
-    public void process(@Element KV<String, Row> element, OutputReceiver<KV<String, GenericRecord>> receiver) {
-        Row row = element.getValue();
-        Schema rowSchema = row.getSchema();
-        org.apache.avro.Schema avroSchema = AvroUtils.toAvroSchema(rowSchema);
-        GenericRecord outputRecord = AvroUtils.toGenericRecord(row, avroSchema);
+    public void process(@Element Row element, OutputReceiver<GenericRecord> receiver) {
+        Schema rowSchema = element.getSchema();
 
-        receiver.output(KV.of(element.getKey(), outputRecord));
+        org.apache.avro.Schema avroSchema = AvroUtils.toAvroSchema(rowSchema);
+        GenericRecord outputRecord = AvroUtils.toGenericRecord(element, avroSchema);
+
+        receiver.output(outputRecord);
     }
 }

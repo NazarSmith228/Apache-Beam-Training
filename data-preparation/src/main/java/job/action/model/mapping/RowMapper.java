@@ -7,7 +7,6 @@ import job.model.common.CsvGenericRecord;
 import job.model.config.ConfigActions;
 import job.model.config.RecordLayout;
 import org.apache.beam.sdk.schemas.Schema;
-import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.Row;
 import org.apache.commons.lang.StringUtils;
 
@@ -26,7 +25,7 @@ public class RowMapper {
         mappingActions = ConfigHandler.getConfigActions().getMappingActions();
     }
 
-    public static KV<String, Row> mapToRow(CsvGenericRecord genericRecord) {
+    public static Row mapToRow(CsvGenericRecord genericRecord) {
         String targetRecordType = genericRecord.getRecordType();
         ConfigActions.MapToAvro mappingAction = mappingActions.get(targetRecordType);
 
@@ -61,12 +60,13 @@ public class RowMapper {
             rowSchemaBuilder.addRowField(StringUtils.capitalize(innerRecordType), innerSchema);
         }
 
-        Schema resultSchema = rowSchemaBuilder.build();
-        Row resultRow = Row.withSchema(resultSchema).addValues(innerRows).build();
         //vulnerability
         String targetSchema = mappingAction.getTargetSchema().split("\\.")[0];
 
-        return KV.of(targetSchema, resultRow);
+        rowSchemaBuilder.addField("targetSchema", Schema.FieldType.STRING);
+        Schema resultSchema = rowSchemaBuilder.build();
+
+        return Row.withSchema(resultSchema).addValues(innerRows).addValue(targetSchema).build();
     }
 
     private static Map<String, String> filterRecordMap(Map<String, String> recordMap, Map<String, String> innerRecordMapping) {

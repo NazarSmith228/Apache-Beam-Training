@@ -2,15 +2,13 @@ package job.action.function.mapping;
 
 import job.action.function.mapping.dofn.ConvertToGenericRecordsDoFn;
 import job.action.model.mapping.RowMapper;
+import job.action.model.mapping.coder.GenericRecordCoder;
 import job.config.utils.ConfigHandler;
 import job.model.common.CsvGenericRecord;
 import job.model.config.ConfigActions;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.SerializableCoder;
-import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.transforms.*;
-import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
 import org.apache.beam.sdk.values.Row;
@@ -18,7 +16,7 @@ import org.apache.beam.sdk.values.Row;
 import java.util.Map;
 import java.util.Set;
 
-public class MapRecordsPTransform extends PTransform<PCollection<CsvGenericRecord>, PCollection<KV<String, GenericRecord>>> {
+public class MapRecordsPTransform extends PTransform<PCollection<CsvGenericRecord>, PCollection<GenericRecord>> {
 
     private final Map<String, ConfigActions.MapToAvro> mappingActions;
 
@@ -27,8 +25,8 @@ public class MapRecordsPTransform extends PTransform<PCollection<CsvGenericRecor
     }
 
     @Override
-    public PCollection<KV<String, GenericRecord>> expand(PCollection<CsvGenericRecord> input) {
-        PCollectionList<KV<String, GenericRecord>> resultList = PCollectionList.empty(input.getPipeline());
+    public PCollection<GenericRecord> expand(PCollection<CsvGenericRecord> input) {
+        PCollectionList<GenericRecord> resultList = PCollectionList.empty(input.getPipeline());
 
         Set<String> targetRecordTypes = mappingActions.keySet();
         for (String targetRecordType : targetRecordTypes) {
@@ -40,31 +38,32 @@ public class MapRecordsPTransform extends PTransform<PCollection<CsvGenericRecor
                     )
                     .setCoder(SerializableCoder.of(CsvGenericRecord.class));
 
-            PCollection<KV<String, Row>> rows = targetRecordsToMap
+            PCollection<Row> rows = targetRecordsToMap
                     .apply("Map CSV records to Rows",
                             ParDo.of(
-                                    new DoFn<CsvGenericRecord, KV<String, Row>>() {
+                                    new DoFn<CsvGenericRecord, Row>() {
                                         @ProcessElement
-                                        public void process(@Element CsvGenericRecord element, OutputReceiver<KV<String, Row>> receiver) {
+                                        public void process(@Element CsvGenericRecord element, OutputReceiver<Row> receiver) {
                                             receiver.output(RowMapper.mapToRow(element));
                                         }
                                     }
                             )
                     )
-                    .setCoder(
-                            KvCoder.of(
-                                    StringUtf8Coder.of(),
-                                    SerializableCoder.of(Row.class)
-                            )
-                    );
+                    .setCoder(SerializableCoder.of(Row.class));
 
-            /**
-             * apply {@link ConvertToGenericRecordsDoFn}
-             */
+            PCollection<GenericRecord> genericRecords = rows
+                    .apply("Map Rows to GenericRecords",
+                            ParDo.of(new ConvertToGenericRecordsDoFn())
+                    )
+                    .setCoder(GenericRecordCoder.of());
 
-            //add mediate collections to resultList
+            resultList = resultList.and(genericRecords);
         }
 
-        return resultList.apply(Flatten.pCollections());
+        return resultList
+                .apply("Merge all resulting PCollections",
+                        Flatten.pCollections()
+                )
+                .setCoder(GenericRecordCoder.of());
     }
 }

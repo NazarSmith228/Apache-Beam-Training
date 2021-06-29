@@ -3,12 +3,17 @@ package job;
 import job.action.function.grouping.ptransform.GroupRecordsPTransform;
 import job.action.function.mapping.MapRecordsPTransform;
 import job.action.function.validation.ValidateRecordsDoFn;
-import job.config.utils.ConfigHandler;
+import job.action.model.mapping.coder.GenericRecordCoder;
 import job.config.DataPrepOptions;
+import job.config.utils.ConfigHandler;
 import job.function.TransformRecordsDoFn;
 import job.model.common.CsvGenericRecord;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.SerializableCoder;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
+import org.apache.beam.sdk.io.AvroIO;
+import org.apache.beam.sdk.io.FileIO;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.MapElements;
@@ -68,11 +73,19 @@ public class DataPreparationJob {
             writeMediateData(groupedRecords, options, "/grouped_records.txt");
         }
 
-        /**
-         * apply {@link MapRecordsPTransform}
-         */
+        PCollection<GenericRecord> mappedRecords = groupedRecords
+                .apply("Map grouped records to AVRO format",
+                        new MapRecordsPTransform()
+                )
+                .setCoder(GenericRecordCoder.of());
 
-        //write result to .avro
+        mappedRecords.apply("Write results to Avro",
+                FileIO.<String, GenericRecord>writeDynamic()
+                        .by(record -> (String) record.get("targetSchema"))
+                        .withDestinationCoder(StringUtf8Coder.of())
+                        .via(AvroIO.sink(GenericRecord.class))
+                        .to(options.getOutputPath())
+                        .withNaming(key -> FileIO.Write.defaultNaming(key, ".avro")));
 
         pipeline.run().waitUntilFinish();
     }
