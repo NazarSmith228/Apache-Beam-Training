@@ -11,9 +11,6 @@ import job.model.common.CsvGenericRecord;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.SerializableCoder;
-import org.apache.beam.sdk.coders.StringUtf8Coder;
-import org.apache.beam.sdk.io.AvroIO;
-import org.apache.beam.sdk.io.FileIO;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.MapElements;
@@ -73,19 +70,11 @@ public class DataPreparationJob {
             writeMediateData(groupedRecords, options, "/grouped_records.txt");
         }
 
-        PCollection<GenericRecord> mappedRecords = groupedRecords
-                .apply("Map grouped records to AVRO format",
+        PCollection<GenericRecord> genericRecords = groupedRecords
+                .apply("Map grouped records to AVRO format and write the results to multiple destinations",
                         new MapRecordsPTransform()
                 )
                 .setCoder(GenericRecordCoder.of());
-
-        mappedRecords.apply("Write results to Avro",
-                FileIO.<String, GenericRecord>writeDynamic()
-                        .by(record -> (String) record.get("targetSchema"))
-                        .withDestinationCoder(StringUtf8Coder.of())
-                        .via(AvroIO.sink(GenericRecord.class))
-                        .to(options.getOutputPath())
-                        .withNaming(key -> FileIO.Write.defaultNaming(key, ".avro")));
 
         pipeline.run().waitUntilFinish();
     }

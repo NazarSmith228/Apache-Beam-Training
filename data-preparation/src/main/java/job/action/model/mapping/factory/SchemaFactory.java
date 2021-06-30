@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class SchemaFactory {
 
-    public static Schema createInnerSchema(Map<String, String> innerRecordFieldTypes) {
+    public static Schema createSchema(Map<String, String> innerRecordFieldTypes) {
         Schema.Builder innerBuilder = Schema.builder();
         innerRecordFieldTypes.forEach(
                 (key, value) -> innerBuilder.addField(key, resolveFieldType(value))

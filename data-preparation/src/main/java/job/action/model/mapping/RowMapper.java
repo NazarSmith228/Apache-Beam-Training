@@ -3,6 +3,7 @@ package job.action.model.mapping;
 import job.action.model.mapping.factory.RowFactory;
 import job.action.model.mapping.factory.SchemaFactory;
 import job.config.utils.ConfigHandler;
+import job.config.utils.FilteringUtils;
 import job.model.common.CsvGenericRecord;
 import job.model.config.ConfigActions;
 import job.model.config.RecordLayout;
@@ -13,7 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class RowMapper {
 
@@ -31,48 +31,31 @@ public class RowMapper {
 
         Map<String, String> fieldsMapping = mappingAction.getFieldsMapping();
 
-        List<String> innerRecordTypes = fieldsMapping.values()
-                .stream()
-                //vulnerability
-                .map(val -> val.split("\\.")[0])
-                .distinct()
-                .collect(Collectors.toList());
+        List<String> innerRecordTypes = FilteringUtils.extractRecordTypes(fieldsMapping);
 
         List<Object> innerRows = new ArrayList<>();
         Schema.Builder rowSchemaBuilder = Schema.builder();
 
         for (String innerRecordType : innerRecordTypes) {
-            Map<String, String> innerRecordMapping = fieldsMapping.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getValue().contains(innerRecordType))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            Map<String, String> innerRecordMapping = FilteringUtils.filterFieldsMapping(fieldsMapping, innerRecordType);
 
-            Map<String, String> innerRecordFieldValues = filterRecordMap(genericRecord.getFields(), innerRecordMapping);
+            Map<String, String> innerRecordFieldValues = FilteringUtils.filterRecordMap(
+                    genericRecord.getFields(), innerRecordMapping);
 
-            Map<String, String> innerRecordFieldTypes = filterRecordMap(
+            Map<String, String> innerRecordFieldTypes = FilteringUtils.filterRecordMap(
                     configLayouts.get(innerRecordType.toUpperCase()).getFieldTypes(),
                     innerRecordMapping);
 
-            Schema innerSchema = SchemaFactory.createInnerSchema(innerRecordFieldTypes);
-            Row innerRow = RowFactory.createInnerRow(innerSchema, innerRecordFieldValues);
+            Schema innerSchema = SchemaFactory.createSchema(innerRecordFieldTypes);
+            Row innerRow = RowFactory.createRow(innerSchema, innerRecordFieldValues);
 
             innerRows.add(innerRow);
             rowSchemaBuilder.addRowField(StringUtils.capitalize(innerRecordType), innerSchema);
         }
 
-        //vulnerability
-        String targetSchema = mappingAction.getTargetSchema().split("\\.")[0];
-
-        rowSchemaBuilder.addField("targetSchema", Schema.FieldType.STRING);
         Schema resultSchema = rowSchemaBuilder.build();
 
-        return Row.withSchema(resultSchema).addValues(innerRows).addValue(targetSchema).build();
+        return Row.withSchema(resultSchema).addValues(innerRows).build();
     }
 
-    private static Map<String, String> filterRecordMap(Map<String, String> recordMap, Map<String, String> innerRecordMapping) {
-        return recordMap.entrySet()
-                .stream()
-                .filter(entry -> innerRecordMapping.containsKey(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
 }

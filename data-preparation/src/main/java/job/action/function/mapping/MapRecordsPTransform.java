@@ -1,17 +1,17 @@
 package job.action.function.mapping;
 
-import job.action.function.mapping.dofn.ConvertToGenericRecordsDoFn;
-import job.action.model.mapping.RowMapper;
 import job.action.model.mapping.coder.GenericRecordCoder;
 import job.config.utils.ConfigHandler;
 import job.model.common.CsvGenericRecord;
 import job.model.config.ConfigActions;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.beam.sdk.coders.SerializableCoder;
-import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.schemas.utils.AvroUtils;
+import org.apache.beam.sdk.transforms.Filter;
+import org.apache.beam.sdk.transforms.Flatten;
+import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
-import org.apache.beam.sdk.values.Row;
 
 import java.util.Map;
 import java.util.Set;
@@ -38,24 +38,14 @@ public class MapRecordsPTransform extends PTransform<PCollection<CsvGenericRecor
                     )
                     .setCoder(SerializableCoder.of(CsvGenericRecord.class));
 
-            PCollection<Row> rows = targetRecordsToMap
-                    .apply("Map CSV records to Rows",
-                            ParDo.of(
-                                    new DoFn<CsvGenericRecord, Row>() {
-                                        @ProcessElement
-                                        public void process(@Element CsvGenericRecord element, OutputReceiver<Row> receiver) {
-                                            receiver.output(RowMapper.mapToRow(element));
-                                        }
-                                    }
-                            )
-                    )
-                    .setCoder(SerializableCoder.of(Row.class));
+            ConfigActions.MapToAvro mappingAction = mappingActions.get(targetRecordType);
+            String targetSchema = mappingAction.getTargetSchema();
+            String avroSchema = AvroUtils.toAvroSchema(mappingAction.getAvroSchema()).toString();
 
-            PCollection<GenericRecord> genericRecords = rows
-                    .apply("Map Rows to GenericRecords",
-                            ParDo.of(new ConvertToGenericRecordsDoFn())
-                    )
-                    .setCoder(GenericRecordCoder.of());
+            PCollection<GenericRecord> genericRecords = targetRecordsToMap
+                    .apply("Map CSV records to GenericRecord.class and write the result to Avro",
+                            new ProcessRecordsPTransform(targetSchema, avroSchema)
+                    );
 
             resultList = resultList.and(genericRecords);
         }

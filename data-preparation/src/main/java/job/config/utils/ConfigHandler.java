@@ -1,7 +1,10 @@
 package job.config.utils;
 
+import job.action.model.mapping.factory.SchemaFactory;
 import job.model.config.ConfigActions;
 import job.model.config.RecordLayout;
+import org.apache.beam.sdk.schemas.Schema;
+import org.apache.commons.lang.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -25,6 +28,13 @@ public class ConfigHandler {
     private static Map<String, RecordLayout> configLayouts;
     private static ConfigActions configActions;
 
+    public static Map<String, RecordLayout> getConfigLayouts() {
+        return configLayouts;
+    }
+
+    public static ConfigActions getConfigActions() {
+        return configActions;
+    }
 
     public static void loadConfig(String path) {
         try (InputStream inputStream = new FileInputStream(path)) {
@@ -93,9 +103,11 @@ public class ConfigHandler {
                 .filter(entry -> entry.get("type").equals("mapToAvro"))
                 .forEach(
                         entry -> {
+                            Map<String, String> fieldsMapping = (Map<String, String>) entry.get("mapping");
                             ConfigActions.MapToAvro action = ConfigActions.MapToAvro.builder()
                                     .targetSchema((String) entry.get("targetSchema"))
-                                    .fieldsMapping((Map<String, String>) entry.get("mapping"))
+                                    .fieldsMapping(fieldsMapping)
+                                    .avroSchema(parseAvroSchema(fieldsMapping))
                                     .build();
                             String recordType = (String) entry.get("sourceLayout");
                             mappingActions.put(recordType, action);
@@ -104,12 +116,22 @@ public class ConfigHandler {
         return mappingActions;
     }
 
-    public static Map<String, RecordLayout> getConfigLayouts() {
-        return configLayouts;
-    }
+    private static Schema parseAvroSchema(Map<String, String> fieldsMapping) {
+        List<String> recordTypes = FilteringUtils.extractRecordTypes(fieldsMapping);
 
-    public static ConfigActions getConfigActions() {
-        return configActions;
-    }
+        Schema.Builder builder = Schema.builder();
 
+        for (String recordType : recordTypes) {
+            Map<String, String> recordMapping = FilteringUtils.filterFieldsMapping(fieldsMapping, recordType);
+
+            Map<String, String> filteredFieldTypes = FilteringUtils.filterRecordMap(
+                    configLayouts.get(recordType.toUpperCase()).getFieldTypes(),
+                    recordMapping);
+
+            Schema recordSchema = SchemaFactory.createSchema(filteredFieldTypes);
+            builder.addRowField(StringUtils.capitalize(recordType), recordSchema);
+        }
+
+        return builder.build();
+    }
 }

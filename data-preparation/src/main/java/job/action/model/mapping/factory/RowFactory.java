@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class RowFactory {
 
-    public static Row createInnerRow(Schema rowSchema, Map<String, String> innerRecordFieldValues) {
+    public static Row createRow(Schema rowSchema, Map<String, String> innerRecordFieldValues) {
         return Row.withSchema(rowSchema)
                 .addValues(constructRowValues(rowSchema, innerRecordFieldValues))
                 .build();

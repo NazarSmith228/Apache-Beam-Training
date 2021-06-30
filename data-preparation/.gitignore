@@ -24,3 +24,4 @@ out/
 *.iws
 src/main/resources/debug/
 src/main/resources/result/
+src/main/resources/output/

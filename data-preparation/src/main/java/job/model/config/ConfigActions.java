@@ -2,6 +2,7 @@ package job.model.config;
 
 import lombok.Builder;
 import lombok.Data;
+import org.apache.beam.sdk.schemas.Schema;
 
 import java.io.Serializable;
 import java.util.List;
@@ -35,5 +36,6 @@ public class ConfigActions implements Serializable {
     public static class MapToAvro implements Serializable {
         private String targetSchema;
         private Map<String, String> fieldsMapping;
+        private Schema avroSchema;
     }
 }
