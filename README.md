@@ -1,5 +1,4 @@
 # Apache-Beam-Training
-#### Readme needs update, i`ll update it in some time:)
 
 ## EventAggregator Job
 
